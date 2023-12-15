@@ -5,7 +5,6 @@ namespace App\Services\Wallet;
 
 use App\Models\Wallet;
 use App\Repositories\Wallet\WalletRepository;
-use App\Services\Convert\ConvertService;
 use App\Services\Service\ServiceWithRepository;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Config;

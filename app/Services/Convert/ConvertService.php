@@ -29,8 +29,7 @@ class ConvertService
             if (isset($data['rates'][$currencyCode])) {
                 return floatval($data['rates'][$currencyCode]) * $amount;
             }
-
-            return null;
+            throw new Exception("No data about currency $toCurrency->code");
         } catch (Exception $e) {
             throw new Exception("ExchangeRatesApi is not responding. Error: {$e->getMessage()}");
         }

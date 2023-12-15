@@ -1,11 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Models\Wallet;
 use App\Services\Convert\ConvertService;
 use App\Services\Transaction\TransactionServiceInterface;
-use App\Services\Wallet\WalletService;
 use App\Services\Wallet\WalletServiceInterface;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -38,11 +37,11 @@ class Transfer implements ShouldQueue
         $storageWallet = $walletService->getStorageWallet();
         $senderWallet = $walletService->getById($transaction->from_wallet_id);
         $receiverWallet = $walletService->getById($transaction->to_wallet_id);
+        $amount = ConvertService::convert($transaction->amount, $senderWallet->currency, $receiverWallet->currency);
+        $commission = ConvertService::convert($transaction->amount * $transaction->commission, $senderWallet->currency, $storageWallet->currency);
+        $fullSum = $transaction->amount + $transaction->amount * $transaction->commission;
         DB::beginTransaction();
         try {
-            $amount = ConvertService::convert($transaction->amount, $senderWallet->currency, $receiverWallet->currency);
-            $commission = ConvertService::convert($transaction->amount * $transaction->commission, $senderWallet->currency, $storageWallet->currency);
-            $fullSum = $transaction->amount + $transaction->amount * $transaction->commission;
             DB::table('wallets')->where(['id' => $senderWallet->id])
                 ->update([
                     'balance' => $senderWallet->balance - $fullSum,
